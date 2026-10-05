@@ -1,0 +1,23 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Project</title><link rel="stylesheet" href="/style.css"></head><body>
+<div class="site-loader" id="siteLoader" role="status" aria-live="polite"><div class="loader-name"><span>EBRAHIM</span><span>REDA</span></div><div class="loader-line" aria-hidden="true"></div></div>
+<nav><a class="logo" href="/"><b>▲</b> Back to portfolio</a></nav><section id="app" style="max-width:900px;margin:auto"></section>
+<script src="/site-loader.js"></script>
+<script>
+const e=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const u=s=>/^(https?:\/\/|\/)/.test(s)?e(s):'#';
+const ext=s=>(s.split('?')[0].split('.').pop()||'').toLowerCase();
+function pv(f){const x=ext(f.url),s=u(f.url);
+ if(['png','jpg','jpeg','gif','webp','svg'].includes(x))return `<img class="pv" src="${s}" alt="">`;
+ if(['mp4','webm','mov'].includes(x))return `<video class="pv" controls src="${s}"></video>`;
+ if(['mp3','wav','ogg'].includes(x))return `<audio controls src="${s}"></audio>`;
+ if(x==='pdf')return `<iframe class="pv" src="${s}" style="width:100%;height:480px;border:1px solid var(--bd)"></iframe>`;return ''}
+fetch('/api/data').then(r=>r.json()).then(D=>{
+ setSiteLoaderName(D.profile?.name);
+ const x=(D.projects||[]).find(p=>p.id===new URLSearchParams(location.search).get('id'));
+ if(!x){app.innerHTML='<h2>Project not found</h2>';hideSiteLoader();return}
+ document.title=x.title;
+ app.innerHTML=`<small class="hl">${e(x.type)}</small><h2>${e(x.title)}</h2>${x.image?`<img class="pv" src="${u(x.image)}" alt="">`:''}<p class="mu">${e(x.summary)}</p><p style="white-space:pre-line;margin:18px 0">${e(x.details)}</p>
+ <h3>Files & Links</h3><div class="files">${(x.files||[]).map(f=>`<div>${pv(f)}<a href="${u(f.url)}" target="_blank" rel="noopener" download><span>${e(f.name||f.url)}</span><span class="hl">Open / Download ⬇</span></a></div>`).join('')||'<span class="mu">No files.</span>'}</div>`;
+ hideSiteLoader();
+}).catch(()=>{app.innerHTML='<h2>Could not load project</h2>';hideSiteLoader()});
+</script></body></html>

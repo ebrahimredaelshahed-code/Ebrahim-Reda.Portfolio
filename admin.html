@@ -1,0 +1,50 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Admin</title><link rel="stylesheet" href="/style.css">
+<style>.w{max-width:900px;margin:auto;padding:20px}.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}.tabs button{background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:8px;padding:8px 14px;cursor:pointer}.tabs .on{border-color:var(--acc);color:var(--acc)}
+input,textarea{width:100%;background:#0b0606;color:var(--tx);border:1px solid var(--bd);border-radius:8px;padding:9px;font:inherit;margin:4px 0 10px}label{font-size:12px;color:var(--mu)}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.row input{flex:1;min-width:140px}.x{background:#5a1a10;color:#fff;border:0;border-radius:8px;padding:8px 12px;cursor:pointer}#msg{position:fixed;bottom:16px;right:16px;background:var(--acc);padding:10px 18px;border-radius:10px;display:none}</style></head><body>
+<div class="site-loader" id="siteLoader" role="status" aria-live="polite"><div class="loader-name"><span>EBRAHIM</span><span>REDA</span></div><div class="loader-line" aria-hidden="true"></div></div>
+<div class="w" id="r"></div><div id="msg"></div>
+<script src="/site-loader.js"></script>
+<script>
+const $=s=>document.querySelector(s),e=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const S={profile:{n:'Profile',one:1,f:[['name','Full name'],['headline','Headline (3 lines separated by |)'],['title','Job title'],['tagline','Tagline'],['photo','Photo (transparent PNG best)','img'],['resume','Resume (PDF)','file'],['about','About','t'],['email','Email'],['phone','Phone'],['location','Location']]},
+socials:{n:'Social links',f:[['label','Name'],['url','URL']]},
+education:{n:'Education',f:[['school','University'],['degree','Degree'],['start','Start date'],['end','End date']]},
+certs:{n:'Certifications',f:[['name','Name'],['date','Date'],['image','Certificate image','img']]},
+projects:{n:'Projects & Training',f:[['title','Title'],['type','Type (Project / Training)'],['summary','Short summary','t'],['image','Cover image','img'],['details','Full details','t'],['files','Files & links','files']]},
+skillsP:{n:'Personal skills',f:[['name','Skill']]},skillsT:{n:'Technical skills',f:[['name','Skill']]},
+volunteering:{n:'Volunteering',f:[['org','Organization'],['role','Position'],['period','Period'],['duties','Responsibilities','t']]}};
+let D,T='profile',pw=sessionStorage.pw||'';
+const H=()=>({'x-admin-password':pw});
+const msg=t=>{const m=$('#msg');m.textContent=t;m.style.display='block';setTimeout(()=>m.style.display='none',2500)};
+const set=(p,v)=>{const a=p.split('.'),l=a.pop();a.reduce((o,k)=>o[k],D)[l]=v};
+const get=p=>p.split('.').reduce((o,k)=>o?.[k],D);
+async function login(){const r=await fetch('/api/data?check=1',{headers:H()});if(!r.ok){sessionStorage.pw='';loginUI(pw?'Wrong password':'');hideSiteLoader();return}
+ sessionStorage.pw=pw;D=await(await fetch('/api/data')).json();setSiteLoaderName(D.profile?.name);Object.keys(S).forEach(k=>{if(!S[k].one&&!D[k])D[k]=[]});if(!D.profile)D.profile={};draw();hideSiteLoader()}
+function loginUI(err){$('#r').innerHTML=`<div class="box" style="max-width:360px;margin:20vh auto"><h2>Admin</h2><input id="pw" type="password" placeholder="Password" autocomplete="current-password" spellcheck="false"><p style="color:#ff8a70">${err||''}</p><button class="btn" id="go">Login</button></div>`;
+ const pwInput=$('#pw'),goBtn=$('#go');
+ pwInput.addEventListener('input',e=>{pw=e.target.value});
+ pwInput.addEventListener('keydown',k=>{if(k.key==='Enter'){k.preventDefault();goBtn.click()}});
+ goBtn.addEventListener('click',()=>{pw=pwInput.value;login()});
+ hideSiteLoader();
+}
+function fld(p,f,v){const[k,l,t]=f;if(t==='files')return`<label>${l}</label>`+(v||[]).map((x,j)=>`<div class="row"><input data-p="${p}.${k}.${j}.name" value="${e(x.name)}" placeholder="Name"><input data-p="${p}.${k}.${j}.url" value="${e(x.url)}" placeholder="URL (upload a file or paste a link)"><input type="file" data-upf="${p}.${k}.${j}"><button class="x" data-rm="${p}.${k}.${j}">✕</button></div>`).join('')+`<button class="btn o" data-addf="${p}.${k}">+ Add file / link</button>`;
+ if(t==='t')return`<label>${l}</label><textarea rows="4" data-p="${p}.${k}">${e(v)}</textarea>`;
+ const up=t?`<input type="file" data-up="${p}.${k}" ${t==='img'?'accept="image/*"':''}>`:'';
+ return`<label>${l}</label><div class="row"><input data-p="${p}.${k}" value="${e(v)}">${up}</div>`+(t==='img'&&v?`<img src="${e(v)}" style="height:60px;border-radius:8px">`:'')}
+function draw(){const s=S[T];let b='';
+ if(s.one)b=`<div class="box">${s.f.map(f=>fld('profile',f,D.profile[f[0]])).join('')}</div>`;
+ else b=D[T].map((it,i)=>`<div class="box" style="margin-bottom:14px">${s.f.map(f=>fld(T+'.'+i,f,it[f[0]])).join('')}<button class="x" data-rm="${T}.${i}">Delete item</button></div>`).join('')+`<button class="btn o" data-add="${T}">+ Add</button>`;
+ $('#r').innerHTML=`<div class="w"><div class="row"><h2 style="flex:1">Admin</h2><a class="btn o" href="/" target="_blank">View site</a><button class="btn" id="sv">Save all</button></div><div class="tabs">${Object.keys(S).map(k=>`<button class="${k===T?'on':''}" data-t="${k}">${S[k].n}</button>`).join('')}</div>${b}</div>`}
+async function up(file){const r=await fetch('/api/upload?filename='+encodeURIComponent(file.name),{method:'POST',headers:{...H(),'content-type':file.type||'application/octet-stream'},body:file});
+ if(!r.ok)throw new Error(r.status===413?'File too large (max 4.5MB)':'Upload failed');return(await r.json()).url}
+document.addEventListener('input',x=>{const target=x.target;if(!target||!target.dataset||!target.dataset.p)return;set(target.dataset.p,target.value)});
+document.addEventListener('change',async x=>{const t=x.target,f=t.files?.[0];if(!f)return;msg('Uploading...');
+ try{const url=await up(f);if(t.dataset.up)set(t.dataset.up,url);else{const p=t.dataset.upf;set(p+'.url',url);if(!get(p+'.name'))set(p+'.name',f.name)}draw();msg('Uploaded — now press Save all')}catch(er){msg(er.message)}});
+document.addEventListener('click',async x=>{const d=x.target.dataset;
+ if(d.t){T=d.t;draw()}
+ else if(d.add){D[d.add].push({id:Date.now().toString(36),files:[]});draw()}
+ else if(d.addf){const a=get(d.addf)||[];set(d.addf.replace(/\.files$/,'')+'.files',a);a.push({name:'',url:''});draw()}
+ else if(d.rm){if(!confirm('Delete?'))return;const a=d.rm.split('.'),i=a.pop();get(a.join('.')).splice(i,1);draw()}
+ else if(x.target.id==='sv'){const r=await fetch('/api/data',{method:'POST',headers:{...H(),'content-type':'application/json'},body:JSON.stringify(D)});msg(r.ok?'Saved ✓':'Save failed')}});
+pw?login():loginUI();
+</script></body></html>

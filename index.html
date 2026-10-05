@@ -1,0 +1,52 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Portfolio</title><link rel="stylesheet" href="/style.css"></head><body>
+<div class="site-loader" id="siteLoader" role="status" aria-live="polite"><div class="loader-name"><span>EBRAHIM</span><span>REDA</span></div><div class="loader-line" aria-hidden="true"></div></div>
+<nav><a class="logo" href="#"><span id="lg"></span></a><ul><li><a href="#about">ABOUT</a></li><li><a href="#education">EDUCATION</a></li><li><a href="#certs">CERTIFICATES</a></li><li><a href="#projects">PROJECTS</a></li><li><a href="#skills">SKILLS</a></li><li><a href="#vol">VOLUNTEERING</a></li></ul></nav>
+<main id="app"></main><footer id="ft"></footer><div id="m" onclick="this.classList.remove('on')"><img id="mi" alt=""></div>
+<script src="/site-loader.js"></script>
+<script>
+const e=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const u=s=>/^(https?:\/\/|mailto:|tel:|\/)/.test(s)?e(s):'#';
+function zoom(s){mi.src=s;m.classList.add('on')}
+fetch('/api/data').then(r=>r.json()).then(D=>{
+const p=D.profile||{},L=(D[0]&&0)||null,hl=(p.headline||'').split('|');
+document.title=p.name+' | Portfolio';
+const fullName=(p.name||'').toUpperCase();
+const nameParts=(p.name||'').trim().split(/\s+/);
+const nameFirst=nameParts.slice(0,-1).join(' ').toUpperCase();
+const nameLast=nameParts.slice(-1).join(' ').toUpperCase();
+setSiteLoaderName(p.name);
+lg.innerHTML = nameParts.length>1 ? `${e(nameFirst)} <span class="gradient-name">${e(nameLast)}</span>` : e(fullName);
+ft.textContent='© '+new Date().getFullYear()+' '+(p.name||'');
+const T=D.skillsT||[],sec=(id,t,b)=>`<section id="${id}"><h2>${t}</h2>${b}</section>`;
+let h=`<section class="hero"><div><div class="hl">HEY !! I'M</div>
+<h1><span class="name-white">${e(nameFirst)}</span><br><span class="gradient-name">${e(nameLast)}</span></h1>
+<p>${e(p.title)} — ${e(p.tagline)}</p>
+<a class="btn o" href="#projects">View Projects</a>${p.resume?` <a class="btn" href="${u(p.resume)}" download>Download Resume</a>`:''}</div>
+<div class="ph">${p.photo?`<img src="${u(p.photo)}" alt="${e(p.name)}">`:`<div class="av">${e((p.name||'?')[0])}</div>`}
+<div class="photo-pointer ptr-biz" aria-hidden="true"><span class="ptr-dot"></span><span class="ptr-line"></span><span class="ptr-label">Business</span></div>
+<div class="photo-pointer ptr-tech" aria-hidden="true"><span class="ptr-dot"></span><span class="ptr-line"></span><span class="ptr-label">Technology</span></div>
+</div></section>`;
+h+=sec('about','About <span class="hl">Me</span>',`<div class="box about"><div><p>${e(p.about)}</p><div class="links">${p.email?`<a href="mailto:${e(p.email)}">✉ ${e(p.email)}</a>`:''}${p.phone?`<a href="tel:${e(p.phone)}">☎ ${e(p.phone)}</a>`:''}${(D.socials||[]).map(s=>`<a href="${u(s.url)}" target="_blank" rel="noopener">${e(s.label)}</a>`).join('')}</div></div></div>`);
+h+=sec('education','Education',`<div class="tl">${(D.education||[]).map(x=>`<div><h3>${e(x.degree)}</h3><div>${e(x.school)}</div><small class="mu">${e(x.start)} – ${e(x.end)}</small></div>`).join('')}</div>`);
+h+=sec('certs','Professional <span class="hl">Certifications</span>',`<div class="grid">${(D.certs||[]).map(c=>`<div class="card">${c.image?`<img src="${u(c.image)}" alt="${e(c.name)}" onclick="zoom(this.src)">`:''}<h3>${e(c.name)}</h3><small>${e(c.date)}</small></div>`).join('')}</div>`);
+h+=sec('projects','Projects <span class="hl">&amp;</span> <span class="section-white">Training</span>',`<div class="grid">${(D.projects||[]).map(x=>`<a class="card" href="/project?id=${encodeURIComponent(x.id)}" target="_blank">${x.image?`<img src="${u(x.image)}" alt="" style="cursor:pointer">`:''}<small class="hl">${e(x.type)}</small><h3>${e(x.title)}</h3><p class="mu">${e(x.summary)}</p></a>`).join('')}</div>`);
+h+=sec('skills','Skills',`<div class="two"><div><h3 style="margin-bottom:14px">Personal Skills</h3><div class="tags">${(D.skillsP||[]).map(s=>`<span>${e(s.name)}</span>`).join('')}</div></div><div><h3 style="margin-bottom:14px">Technical Skills</h3><div class="tags">${T.map(s=>`<span>${e(s.name)}</span>`).join('')}</div></div></div>`);
+h+=sec('vol','Volunteering',`<div class="grid">${(D.volunteering||[]).map(v=>`<div class="card"><h3>${e(v.role)}</h3><div class="hl">${e(v.org)}</div><small>${e(v.period)}</small><p class="mu" style="white-space:pre-line;margin-top:8px">${e(v.duties)}</p></div>`).join('')}</div>`);
+app.innerHTML=h;
+const setupScrollReveals=()=>{
+if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches&&'IntersectionObserver'in window){
+const sections=app.querySelectorAll('section:not(.hero)');
+const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{
+if(entry.isIntersecting){entry.target.classList.add('is-visible');observer.unobserve(entry.target)}
+}),{threshold:0,rootMargin:'0px'});
+sections.forEach((section,index)=>{
+section.classList.add('scroll-reveal',index%2===0?'reveal-from-right':'reveal-from-left');
+observer.observe(section);
+});
+}
+};
+if(document.body.classList.contains('site-ready'))setupScrollReveals();
+else document.addEventListener('site-loader:hidden',setupScrollReveals,{once:true});
+hideSiteLoader();
+}).catch(()=>{app.innerHTML='<section><h2>Could not load data</h2></section>';hideSiteLoader()});
+</script></body></html>

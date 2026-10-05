@@ -1,0 +1,64 @@
+{
+  "profile": {
+    "name": "Ebrahim Reda",
+    "headline": "EBRAHIM REDA ",
+    "title": "Full Stack Developer & UI/UX Designer",
+    "tagline": "",
+    "photo": "/uploads/1791236729066-7ad753-IMG_20261006_002948.png",
+    "resume": "/uploads/1791242929320-e1bdbd-strategic_deception_plan.docx",
+    "about": "I am a Full Stack Developer with a passion for creating seamless digital experiences.",
+    "email": "you@example.com",
+    "phone": "01558450550",
+    "location": "Egypt"
+  },
+  "socials": [
+    {
+      "label": "LinkedIn",
+      "url": "https://linkedin.com"
+    },
+    {
+      "label": "GitHub",
+      "url": "https://github.com"
+    }
+  ],
+  "education": [
+    {
+      "school": "Your University",
+      "degree": "Bachelor's Degree",
+      "start": "2020",
+      "end": "2024"
+    }
+  ],
+  "certs": [
+    {
+      "id": "muvv56d3",
+      "files": []
+    }
+  ],
+  "projects": [
+    {
+      "id": "muvv5i12",
+      "files": []
+    }
+  ],
+  "skillsP": [
+    {
+      "name": "Teamwork"
+    },
+    {
+      "name": "Communication"
+    }
+  ],
+  "skillsT": [
+    {
+      "name": "JavaScript"
+    },
+    {
+      "name": "React"
+    },
+    {
+      "name": "Node.js"
+    }
+  ],
+  "volunteering": []
+}
