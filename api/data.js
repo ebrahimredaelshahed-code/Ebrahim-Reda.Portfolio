@@ -22,8 +22,19 @@ export default async function handler(req, res) {
   }
   if (req.method === 'POST') {
     if (!auth(req)) return res.status(401).json({ error: 'unauthorized' });
-    await put(K, JSON.stringify(req.body), { access: 'public', addRandomSuffix: false, allowOverwrite: true, contentType: 'application/json', cacheControlMaxAge: 60 });
-    return res.json({ ok: 1 });
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      console.error('Cannot save portfolio data: BLOB_READ_WRITE_TOKEN is not configured');
+      return res.status(500).json({ error: 'Blob storage is not connected to this Vercel project.' });
+    }
+    try {
+      await put(K, JSON.stringify(req.body), { access: 'public', addRandomSuffix: false, allowOverwrite: true, contentType: 'application/json', cacheControlMaxAge: 60 });
+      return res.json({ ok: 1 });
+    } catch (error) {
+      console.error('Failed to save portfolio data to Vercel Blob:', error);
+      return res.status(500).json({
+        error: error instanceof Error ? error.message : 'Unexpected storage error'
+      });
+    }
   }
   res.status(405).end();
 }

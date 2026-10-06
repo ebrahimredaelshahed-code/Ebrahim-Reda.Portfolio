@@ -45,6 +45,12 @@ document.addEventListener('click',async x=>{const d=x.target.dataset;
  else if(d.add){D[d.add].push({id:Date.now().toString(36),files:[]});draw()}
  else if(d.addf){const a=get(d.addf)||[];set(d.addf.replace(/\.files$/,'')+'.files',a);a.push({name:'',url:''});draw()}
  else if(d.rm){if(!confirm('Delete?'))return;const a=d.rm.split('.'),i=a.pop();get(a.join('.')).splice(i,1);draw()}
- else if(x.target.id==='sv'){const r=await fetch('/api/data',{method:'POST',headers:{...H(),'content-type':'application/json'},body:JSON.stringify(D)});msg(r.ok?'Saved ✓':'Save failed')}});
+ else if(x.target.id==='sv'){
+  try{
+   const r=await fetch('/api/data',{method:'POST',headers:{...H(),'content-type':'application/json'},body:JSON.stringify(D)});
+   let result={};try{result=await r.json()}catch{}
+   msg(r.ok?'Saved ✓':`Save failed (${r.status}): ${result.error||'Check Vercel Function Logs'}`);
+  }catch(error){msg(`Save failed: ${error.message}`)}
+ }});
 pw?login():loginUI();
 </script></body></html>
