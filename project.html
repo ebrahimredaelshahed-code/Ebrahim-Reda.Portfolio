@@ -16,7 +16,7 @@ fetch('/api/data').then(r=>r.json()).then(D=>{
  const x=(D.projects||[]).find(p=>p.id===new URLSearchParams(location.search).get('id'));
  if(!x){app.innerHTML='<h2>Project not found</h2>';hideSiteLoader();return}
  document.title=x.title;
- app.innerHTML=`<small class="hl">${e(x.type)}</small><h2>${e(x.title)}</h2>${x.image?`<img class="pv" src="${u(x.image)}" alt="">`:''}<p class="mu">${e(x.summary)}</p><p style="white-space:pre-line;margin:18px 0">${e(x.details)}</p>
+ app.innerHTML=`<small class="hl">${e(x.type)}</small><h2>${e(x.title)}</h2>${x.org?`<p class="mu">${e(x.org)}</p>`:''}${x.image?`<img class="pv" src="${u(x.image)}" alt="">`:''}<p class="mu">${e(x.summary)}</p><p style="white-space:pre-line;margin:18px 0">${e(x.details)}</p>
  <h3>Files & Links</h3><div class="files">${(x.files||[]).map(f=>`<div>${pv(f)}<a href="${u(f.url)}" target="_blank" rel="noopener" download><span>${e(f.name||f.url)}</span><span class="hl">Open / Download ⬇</span></a></div>`).join('')||'<span class="mu">No files.</span>'}</div>`;
  hideSiteLoader();
 }).catch(()=>{app.innerHTML='<h2>Could not load project</h2>';hideSiteLoader()});
